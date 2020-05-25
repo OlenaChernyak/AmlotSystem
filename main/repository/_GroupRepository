@@ -1,0 +1,12 @@
+import com.olenachernyak.AmlotProject.entity._Group;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Collection;
+
+@Repository
+public interface _GroupRepository extends JpaRepository<_Group, Long> {
+
+    Collection<_Group> findAllByCompanyId(long id);
+    
+    }
