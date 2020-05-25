@@ -1,0 +1,54 @@
+import com.olenachernyak.AmlotProject.rest.AdminSession;
+import com.olenachernyak.AmlotProject.rest.AmlotSystem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.UUID;
+
+@CrossOrigin("http://localhost:4200")
+@RestController
+@RequestMapping("/api")
+public class LoginController {
+    private static final int LENGTH_TOKEN = 15;
+    private AmlotSystem couponSystem;
+    private Map<String, AdminSession> tokensMap;
+
+    @Autowired
+    public LoginController(AmlotSystem couponSystem, @Qualifier("tokens")Map<String, AdminSession> tokensMap){
+        this.couponSystem = couponSystem;
+        this.tokensMap = tokensMap;
+    }
+
+    /**
+     * Performs login of the client
+     * @param name - name of client
+     * @param password - password of client
+     * @return - new session
+     */
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestParam String name, @RequestParam String password) {
+        try {
+            AdminSession session = couponSystem.login(name, password);
+            String token = generateToken();
+            tokensMap.put(token, session);
+            return ResponseEntity.ok(token);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    /**
+     * Generates a universally unique identifier for a client
+     * @return - token
+     */
+    private String generateToken() {
+        return UUID.randomUUID()
+                .toString()
+                .replaceAll("-", "")
+                .substring(0, LENGTH_TOKEN);
+    }
+}
