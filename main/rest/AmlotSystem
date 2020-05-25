@@ -1,0 +1,35 @@
+import com.olenachernyak.AmlotProject.exception.InvalidLoginException;
+import com.olenachernyak.AmlotProject.service.AdminService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
+
+@Service
+public class AmlotSystem {
+
+    private ApplicationContext context;
+    private AdminService service;
+    private Map<String, AdminSession> tokensMap;
+
+    @Autowired
+    public AmlotSystem(ApplicationContext context, AdminService service, Map<String, AdminSession> tokensMap) {
+        this.context = context;
+        this.service = service;
+        this.tokensMap = tokensMap;
+    }
+
+    public AdminSession login(String name, String password) throws InvalidLoginException {
+        if (name.equals("{{your.name}}") && password.equals("{{your.password}}")) {
+            AdminService service = context.getBean(AdminService.class);
+            AdminSession session = context.getBean(AdminSession.class);
+            session.setAdminService(service);
+            session.accessed();
+            return session;
+        } else
+            throw new InvalidLoginException("Incorrect password or name");
+    }
+
+
+}
