@@ -1,0 +1,182 @@
+import com.olenachernyak.AmlotProject.entity.Company;
+import com.olenachernyak.AmlotProject.entity._Group;
+import com.olenachernyak.AmlotProject.exception.CompanyAlreadyExistsException;
+import com.olenachernyak.AmlotProject.rest.AdminSession;
+import com.olenachernyak.AmlotProject.service.AdminServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
+import java.util.Map;
+
+@CrossOrigin("http://localhost:4200")
+@RestController
+@RequestMapping("/api")
+public class AdminController {
+    private AdminServiceImpl service;
+    private Map<String, AdminSession> tokensMap;
+
+    @Autowired
+    public AdminController(@Qualifier("tokens") Map<String, AdminSession> tokensMap, AdminServiceImpl service) {
+        this.service = service;
+        this.tokensMap = tokensMap;
+    }
+
+    private AdminSession getSession(String token) {
+        return tokensMap.get(token);
+    }
+
+    @PostMapping("/admin/{token}/companies")
+    public ResponseEntity<Company> createCompany(@PathVariable String token, @RequestBody Company company) throws CompanyAlreadyExistsException {
+        AdminSession session = getSession(token);
+        if (session != null) {
+            session.accessed();
+            Company c = service.createCompany(company);
+            if (c != null) {
+                return ResponseEntity.ok(c);
+            }
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @DeleteMapping("/admin/{token}/companies/{id}")
+    public ResponseEntity<Void> deleteCompany(@PathVariable String token, @PathVariable long id) {
+        AdminSession session = getSession(token);
+        if (session != null) {
+            session.accessed();
+            Company company = service.findCompanyById(id);
+            if (company != null) {
+                service.deleteCompany(id);
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("/admin/{token}/groups/byId/{id}")
+    public ResponseEntity<_Group> findGroupById(@PathVariable String token, @PathVariable long id) {
+        AdminSession session = getSession(token);
+        if (session != null) {
+            session.accessed();
+            _Group group = service.findGroupById(id);
+            if (group != null) {
+                return ResponseEntity.ok(group);
+            }
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @DeleteMapping("/admin/{token}/groups/{id}")
+    public ResponseEntity<Void> deleteGroup(@PathVariable String token, @PathVariable long id) {
+        AdminSession session = getSession(token);
+        if (session != null) {
+            session.accessed();
+            _Group group = service.findGroupById(id);
+            if (group != null) {
+                Company company = group.getCompany();
+                    service.deminishCompanyCommission(group.getCommission(), company.getId());
+                    service.deleteGroup(id);
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+
+    @GetMapping("/admin/{token}/allCompanies")
+    public ResponseEntity<Collection<Company>> getAllCompanies(@PathVariable String token) {
+        AdminSession session = getSession(token);
+        if (session != null) {
+            session.accessed();
+            Collection<Company> companies = service.findAllCompanies();
+            if (companies != null) {
+                return ResponseEntity.ok(companies);
+            }
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("/admin/{token}/groups")
+    public ResponseEntity<Collection<_Group>> getAllGroups(@PathVariable String token) {
+        AdminSession session = getSession(token);
+        if (session != null) {
+            session.accessed();
+            Collection<_Group> groups = service.findAllGroups();
+            if (groups != null) {
+                return ResponseEntity.ok(groups);
+            }
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @PostMapping("/admin/{token}/groups")
+    public ResponseEntity<_Group> createGroup(@PathVariable String token, @RequestBody _Group group) {
+        AdminSession session = getSession(token);
+        if (session != null) {
+            session.accessed();
+            _Group g = service.createGroup(group);
+            Company company = g.getCompany();
+            service.addCommissionToCompany(g.getCommission(), company.getId());
+            if (g != null) {
+                return ResponseEntity.ok(g);
+            }
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("/admin/{token}/companies/byId/{id}")
+    public ResponseEntity<Company> findCompanyById(@PathVariable String token, @PathVariable long id) {
+        AdminSession session = getSession(token);
+        if (session != null) {
+            session.accessed();
+            Company company = service.findCompanyById(id);
+            if (company != null) {
+                ResponseEntity.ok(company);
+            }
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @PutMapping("/admin/{token}/groups_update")
+    public ResponseEntity<_Group> updateGroup(@PathVariable String token, @RequestBody _Group group) {
+        AdminSession session = getSession(token);
+        if (session != null) {
+            session.accessed();
+            _Group groupToUpdate = service.findGroupById(group.getId());
+            if (group != null) {
+                Company company = groupToUpdate.getCompany();
+                service.deminishCompanyCommission(groupToUpdate.getCommission(),company.getId());
+                service.updateGroup(group);
+                service.addCommissionToCompany(group.getCommission(),company.getId());
+                return ResponseEntity.ok(group);
+            }
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("/admin/{token}/companyId_groups/{id}")
+    public ResponseEntity<Collection<_Group>> getAllByCompanyId(@PathVariable String token, @PathVariable long id) {
+        AdminSession session = getSession(token);
+        if (session != null) {
+            session.accessed();
+            Collection<_Group> groups = service.findAllByCompanyId(id);
+            if (groups != null && !groups.isEmpty()) {
+                return ResponseEntity.ok(groups);
+            }
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+}
