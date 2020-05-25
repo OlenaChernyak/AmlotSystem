@@ -1,0 +1,107 @@
+import com.olenachernyak.AmlotProject.entity.Company;
+import com.olenachernyak.AmlotProject.entity._Group;
+import com.olenachernyak.AmlotProject.exception.CompanyAlreadyExistsException;
+import com.olenachernyak.AmlotProject.repository.CompanyRepository;
+import com.olenachernyak.AmlotProject.repository._GroupRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+
+
+@Service
+public class AdminServiceImpl implements AdminService {
+
+    private CompanyRepository companyRepository;
+    private _GroupRepository groupRepository;
+
+
+    @Autowired
+    public AdminServiceImpl(CompanyRepository companyRepository, _GroupRepository groupRepository) {
+        this.companyRepository = companyRepository;
+        this.groupRepository = groupRepository;
+
+    }
+
+    @Override
+    public _Group createGroup(_Group group) {
+        Company company = companyRepository.findTopByName(group.getCompanyName());
+        Optional<Company> companyOpt = companyRepository.findById(company.getId());
+        if (group != null && companyOpt.isPresent()) {
+            group.setCompany(company);
+            return groupRepository.save(group);
+        }
+        return null;
+    }
+
+    @Override
+    public Company createCompany(Company company) throws CompanyAlreadyExistsException {
+        if (company != null) {
+            if (checkCompany(company.getName())) {
+                company.setId(0);
+                return companyRepository.save(company);
+            } else {
+                throw new CompanyAlreadyExistsException("Company already exists");
+            }
+        }
+        return null;
+    }
+
+    private boolean checkCompany(String name) {
+        Company newCompany = companyRepository.findTopByName(name);
+        if (newCompany == null) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Company findCompanyById(long id) {
+        return companyRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public void deleteGroup(long id) {
+        groupRepository.deleteById(id);
+    }
+
+    @Override
+    public _Group updateGroup(_Group group) {
+        return groupRepository.save(group);
+    }
+
+    @Override
+    public _Group findGroupById(long id) {
+        return groupRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Collection<Company> findAllCompanies() {
+        return companyRepository.findAll();
+    }
+
+    @Override
+    public Collection<_Group> findAllGroups() {
+        return groupRepository.findAll();
+    }
+
+    @Override
+    public void deleteCompany(long id) {
+        companyRepository.deleteById(id);
+    }
+
+    @Override
+    public Collection<_Group> findAllByCompanyId(long id) {
+        return groupRepository.findAllByCompanyId(id);
+    }
+
+    @Override
+    public void addCommissionToCompany(double commission, long id) {
+        companyRepository.addCommissionToCompany(commission, id);
+    }
+
+    @Override
+    public void deminishCompanyCommission(double commission, long id) {
+        companyRepository.updateCompanyCommission(commission, id);
+    }
+}
