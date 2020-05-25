@@ -1,0 +1,65 @@
+import com.olenachernyak.AmlotProject.entity.Company;
+import com.olenachernyak.AmlotProject.entity._Group;
+import com.olenachernyak.AmlotProject.exception.CompanyAlreadyExistsException;
+
+import java.util.Collection;
+
+public interface AdminService {
+    /*
+    Create a new company
+     */
+    Company createCompany(Company company) throws CompanyAlreadyExistsException;
+
+    /*
+    Delete company
+     */
+    void deleteCompany(long id);
+
+    /*
+    Find company by id
+     */
+    Company findCompanyById(long id);
+
+    /*
+    Get all companies
+     */
+    Collection<Company> findAllCompanies();
+
+    /*
+    Get group by id
+     */
+    _Group findGroupById(long id);
+
+    /*
+    Update group
+     */
+    _Group updateGroup(_Group group);
+
+    /*
+    Get all groups
+     */
+    Collection<_Group> findAllGroups();
+
+    /*
+    Delete group
+     */
+    void deleteGroup(long id);
+
+    _Group createGroup(_Group group);
+
+    /*
+    Get all groups of the company
+     */
+    Collection<_Group> findAllByCompanyId(long id);
+
+    /*
+    Add commission to the company once the group is created
+     */
+    void addCommissionToCompany(double commission, long id);
+
+    /*
+    Update company's total commission on update or delete group
+     */
+    void deminishCompanyCommission(double commission, long id);
+
+}
