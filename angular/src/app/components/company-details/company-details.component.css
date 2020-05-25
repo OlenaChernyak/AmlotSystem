@@ -1,0 +1,11 @@
+contaner{
+    margin-top: 20px;;
+}
+
+table {
+    overflow: auto;
+    width: 100%;
+  }
+  .groupPrint{
+    float: right;
+  }

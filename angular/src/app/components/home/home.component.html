@@ -1,0 +1,178 @@
+<mat-toolbar color="primary">
+    <mat-toolbar-row>
+        <button mat-button [matMenuTriggerFor]="groupsMenu">Groups</button>
+        <mat-menu #groupsMenu="matMenu" yPosition="below">
+            <button mat-menu-item (click)="getAllGroups()">All groups</button>
+            <button mat-menu-item (click)="addGroup()">Add group</button>
+        </mat-menu>
+
+        <button mat-button [matMenuTriggerFor]="companiesMenu">Companies</button>
+        <mat-menu #companiesMenu="matMenu" yPosition="below">
+            <button mat-menu-item (click)="addCompany()">Add company</button>
+            <button mat-menu-item (click)="getAllCompanies()">All companies</button>
+        </mat-menu>
+
+    </mat-toolbar-row>
+</mat-toolbar>
+<!-- ====================================================================== -->
+<div *ngIf="allGroupsButton">
+    <mat-form-field>
+        <mat-label>Filter</mat-label>
+        <input matInput (keyup)="filterGroupTable($event)" placeholder="Ex. ium">
+    </mat-form-field>
+
+    <button mat-button class="groupPrint" (click)="printTable()">Print</button>
+
+    <table mat-table [dataSource]="groupData" class="mat-elevation-z8" matSort id="groupTable">
+
+        <ng-container matColumnDef="coupon">
+            <th mat-header-cell *matHeaderCellDef> No. </th>
+            <td mat-cell *matCellDef="let element"> {{element.coupon}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="company">
+            <th mat-header-cell *matHeaderCellDef> Company </th>
+            <td mat-cell *matCellDef="let element"> {{element.companyName}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="country">
+            <th mat-header-cell *matHeaderCellDef> Country </th>
+            <td mat-cell *matCellDef="let element"> {{element.country}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef> Amount </th>
+            <td mat-cell *matCellDef="let element"> {{element.amount}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="giude">
+            <th mat-header-cell *matHeaderCellDef> Guide </th>
+            <td mat-cell *matCellDef="let element"> {{element.guide}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="driver">
+            <th mat-header-cell *matHeaderCellDef> Driver </th>
+            <td mat-cell *matCellDef="let element"> {{element.driver}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+            <td mat-cell *matCellDef="let element"> {{element.date}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="commission">
+            <th mat-header-cell *matHeaderCellDef> Commission </th>
+            <td mat-cell *matCellDef="let element"> {{element.commission}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="update">
+            <th mat-header-cell *matHeaderCellDef> Update </th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button color="accent" (click)="openUpdateGroupDialog(element.id)">
+                  <mat-icon class="mat-18">system_update</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+       
+          <ng-container matColumnDef="delete">
+              <th mat-header-cell *matHeaderCellDef> Delete </th>
+              <td mat-cell *matCellDef="let element">
+                <button mat-icon-button color="warn" (click)="deleteGroup(element.id)">
+                    <mat-icon class="mat-18">delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedGroupColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedGroupColumns;"></tr>
+    </table>
+    <mat-paginator [pageSize]="6" [pageSizeOptions]="[2, 4, 6, 10, 20]">
+    </mat-paginator>
+</div>
+<!-- ===================================================================== -->
+<div *ngIf="addGroupButton">
+    <form class="group-form" #groupForm="ngForm" [style.fontSize.px]=10 (ngSubmit)="saveGroup(group)">
+        <mat-form-field appearance="outline">
+            <mat-label>Coupon</mat-label>
+            <input matInput [(ngModel)]="group.coupon" type="number" name="coupon">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Company</mat-label>
+            <input matInput [(ngModel)]="group.companyName" type="text" name="company">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Country</mat-label>
+            <input matInput [(ngModel)]="group.country" type="text" name="country">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Amount</mat-label>
+            <input matInput [(ngModel)]="group.amount" type="number" name="amount">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Guide</mat-label>
+            <input matInput [(ngModel)]="group.guide" type="text" name="guide">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Driver</mat-label>
+            <input matInput [(ngModel)]="group.driver" type="text" name="driver">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput [(ngModel)]="group.date" type="date" name="date">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Commission</mat-label>
+            <input matInput [(ngModel)]="group.commission" type="number" name="commission">
+        </mat-form-field>
+        <br>
+        <button mat-button color="primary" type="submit" value="Submit">Save</button>
+    </form>
+</div>
+<!-- ====================================================================== -->
+<div *ngIf="allCompaniesButton">
+    <mat-form-field>
+        <mat-label>Filter</mat-label>
+        <input matInput (keyup)="filterCompanyTable($event)" placeholder="Ex. ium">
+    </mat-form-field>
+
+    <table mat-table [dataSource]="companyData" class="mat-elevation-z8">
+
+        <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> No. </th>
+            <td mat-cell *matCellDef="let element"><a (click)="openCompanyDetailsDialog(element.id)"> {{element.id}}</a> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Name </th>
+            <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="commission">
+            <th mat-header-cell *matHeaderCellDef> Commission </th>
+            <td mat-cell *matCellDef="let element"> {{element.commission}} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedCompanyColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedCompanyColumns;"></tr>
+    </table>
+</div>
+
+<!-- ===================================================================== -->
+<div *ngIf="addCompanyButton">
+    <form class="group-form" #companyForm="ngForm" [style.fontSize.px]=10 (ngSubmit)="saveCompany(company)">
+        <h3>Add a new company</h3>
+        <mat-form-field appearance="outline">
+            <mat-label>Name</mat-label>
+            <input matInput [(ngModel)]="company.name" type="text" name="name">
+        </mat-form-field>
+        <button mat-button color="primary" type="submit" value="Submit">Save</button>
+    </form>
+</div>
+

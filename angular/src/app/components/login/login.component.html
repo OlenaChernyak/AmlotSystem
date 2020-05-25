@@ -1,0 +1,14 @@
+<form class="login-form" #authForm="ngForm" (ngSubmit)="onSubmit()">
+    <h3>Enter name and password</h3>
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput [(ngModel)]="name" type="text" name="name">
+    </mat-form-field>
+  
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input matInput [(ngModel)]="password" type="text" name="password">
+    </mat-form-field>
+    <button mat-button color="primary">Login</button>
+  </form>
+  

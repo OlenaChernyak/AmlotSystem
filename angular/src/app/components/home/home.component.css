@@ -1,0 +1,28 @@
+.mat-toolbar{
+    border-radius: 3px;  
+}
+ 
+@media(max-width: 959px){
+    mat-toolbar{
+        border-radius: 0px;
+    }
+}
+table {
+    overflow: auto;
+    width: 100%;
+  }
+  
+  
+  .mat-form-field {
+    font-size: 14px;
+    width: 40%;
+  }
+  .group-form{
+      margin-top: 30px;
+      margin-left: 40px;;
+  }
+
+  .groupPrint{
+    float: right;
+  }
+

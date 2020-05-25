@@ -1,0 +1,47 @@
+<div mat-dialog-content>
+    <form class="group-form" #groupForm="ngForm">
+        <mat-form-field appearance="outline">
+            <mat-label>Coupon</mat-label>
+            <input matInput [(ngModel)]="group.coupon" type="number" name="coupon" value="{{group.coupon}}">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Company</mat-label>
+            <input matInput [(ngModel)]="group.companyName" type="text" name="companyName" value="{{group.companyName}}">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Country</mat-label>
+            <input matInput [(ngModel)]="group.country" type="text" name="country" value="{{group.country}}">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Amount</mat-label>
+            <input matInput [(ngModel)]="group.amount" type="number" name="amount" value="{{group.amount}}">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Guide</mat-label>
+            <input matInput [(ngModel)]="group.guide" type="text" name="guide" value="{{group.guide}}">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Driver</mat-label>
+            <input matInput [(ngModel)]="group.driver" type="text" name="driver" value="{{group.driver}}">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput [(ngModel)]="group.date" type="date" name="date" value="{{group.date}}">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Commission</mat-label>
+            <input matInput [(ngModel)]="group.commission" type="number" name="commission" value="{{group.commission}}">
+        </mat-form-field>
+    </form>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">No Thanks</button>
+    <button mat-button [mat-dialog-close]="group" (click)="save(group)" cdkFocusInitial>Ok</button>
+  </div> 
