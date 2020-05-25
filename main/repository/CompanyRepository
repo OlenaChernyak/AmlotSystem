@@ -1,0 +1,25 @@
+import com.olenachernyak.AmlotProject.entity.Company;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+@Repository
+public interface CompanyRepository extends JpaRepository<Company, Long> {
+
+    Company findTopByName(String name);
+
+
+    @Transactional
+    @Modifying
+    @Query("update Company c set c.commission = c.commission + :increaseBy where c.id=:id")
+    void addCommissionToCompany(@Param("increaseBy") double increaseBy, @Param("id") long id);
+
+    @Transactional
+    @Modifying
+    @Query("update Company c set c.commission = c.commission - :decreaseBy where c.id=:id")
+    void updateCompanyCommission(@Param("decreaseBy") double decreaseBy, @Param("id") long id);
+
+}
